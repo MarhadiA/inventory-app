@@ -1,0 +1,38 @@
+<%- include('../partials/header') %>
+
+<h2>Detail Transaksi</h2>
+
+<div class="detail-card">
+    <p><strong>Nama Barang:</strong> <%= transaction.Item ? transaction.Item.name : 'N/A' %></p>
+    <p><strong>Jenis Transaksi:</strong> <%= transaction.type %></p>
+    <p><strong>Jumlah:</strong> <%= transaction.quantity %></p>
+       <p><strong>Harga Satuan Saat Transaksi:</strong> Rp <%= (transaction.priceAtTransaction || 0).toLocaleString('id-ID') %></p>
+    <p><strong>Tanggal Transaksi:</strong> <%= new Date(transaction.transactionDate).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }) %></p>
+    <p style="color: red;">DEBUG - Quantity: <%= transaction.quantity %> (Type: <%= typeof transaction.quantity %>)</p>
+    <p style="color: red;">DEBUG - Price: <%= transaction.priceAtTransaction %> (Type: <%= typeof transaction.priceAtTransaction %>)</p>
+        <p><strong>Tota l Harga (Jumlah x Harga Satuan):</strong> 
+        <strong>Rp <%= (transaction.quantity * (transaction.priceAtTransaction || 0)).toLocaleString('id-ID') %></strong>
+    </p>
+</div>
+
+<a href="/transactions" class="btn">Kembali ke Daftar Transaksi</a>
+
+<style>
+    .detail-card {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        margin-top: 20px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .detail-card p {
+        margin-bottom: 10px;
+        font-size: 1.1em;
+    }
+    .detail-card strong {
+        color: #333;
+    }
+</style>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,180 @@
+<%- include('partials/header') %>
+
+<div class="container">
+    <h2>Dashboard Inventaris</h2>
+
+    <div class="dashboard-summary">
+        <div class="card">
+            <h3>Total Barang</h3>
+            <p><%= totalItems %></p>
+        </div>
+        <div class="card">
+            <h3>Total Kategori</h3>
+            <p><%= totalCategories %></p>
+        </div>
+    </div>
+
+    <div class="chart-container">
+        <h3>Tren Nilai Transaksi (6 Bulan Terakhir)</h3>
+        <canvas id="transactionChart"></canvas>
+    </div>
+</div>
+
+<script>
+    // --- Bagian Log Debugging ---
+    console.log("=== Memulai Skrip Dashboard EJS ===");
+    console.log("Data chartLabels dari EJS (raw):", <%- JSON.stringify(chartLabels || []) %>);
+    console.log("Data chartDataMasuk dari EJS (raw):", <%- JSON.stringify(chartDataMasuk || []) %>);
+    console.log("Data chartDataKeluar dari EJS (raw):", <%- JSON.stringify(chartDataKeluar || []) %>);
+    // console.log("Total Items dari EJS (raw):", <%= totalItems %>);
+    // console.log("Total Categories dari EJS (raw):", <%= totalCategories %>);
+
+
+    // --- Deklarasi Variabel JavaScript dengan Data EJS ---
+    const chartLabels = <%- JSON.stringify(chartLabels || []) %>;
+    const chartDataMasuk = <%- JSON.stringify(chartDataMasuk || []) %>;
+    const chartDataKeluar = <%- JSON.stringify(chartDataKeluar || []) %>;
+
+    // --- Log Variabel JavaScript Lokal ---
+    console.log("Chart Labels (JS Variable):", chartLabels);
+    console.log("Chart Data Masuk (JS Variable):", chartDataMasuk);
+    console.log("Chart Data Keluar (JS Variable):", chartDataKeluar);
+
+
+    // --- Logika Menggambar Grafik ---
+    if (chartLabels.length > 0 && chartDataMasuk.length > 0 && chartDataKeluar.length > 0) {
+        console.log("Kondisi menggambar grafik terpenuhi. Mencoba mendapatkan canvas context...");
+
+        const canvasElement = document.getElementById('transactionChart');
+        if (canvasElement) {
+            const ctx = canvasElement.getContext('2d');
+            if (ctx) {
+                console.log("Canvas context berhasil didapatkan. Menggambar grafik...");
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: chartLabels,
+                        datasets: [
+                            {
+                                label: 'Nilai Barang Masuk',
+                                data: chartDataMasuk,
+                                borderColor: 'rgb(75, 192, 192)',
+                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                tension: 0.1,
+                                fill: true
+                            },
+                            {
+                                label: 'Nilai Barang Keluar',
+                                data: chartDataKeluar,
+                                borderColor: 'rgb(255, 99, 132)',
+                                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                tension: 0.1,
+                                fill: true
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Total Nilai (Rp)'
+                                },
+                                ticks: {
+                                    callback: function(value, index, values) {
+                                        return 'Rp ' + value.toLocaleString('id-ID');
+                                    }
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Bulan'
+                                }
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed.y !== null) {
+                                            label += 'Rp ' + context.parsed.y.toLocaleString('id-ID');
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+                console.log("Grafik Chart.js selesai dibuat.");
+            } else {
+                console.error("ERROR: Gagal mendapatkan konteks 2D dari canvas (ctx is null).");
+            }
+        } else {
+            console.error("ERROR: Elemen canvas dengan ID 'transactionChart' tidak ditemukan di DOM.");
+        }
+    } else {
+        console.log("Data grafik tidak lengkap atau kosong. Tidak dapat menggambar grafik.");
+        console.log("Labels:", chartLabels, "Masuk:", chartDataMasuk, "Keluar:", chartDataKeluar);
+    }
+
+    console.log("=== Akhir Skrip Dashboard EJS ===");
+</script>
+
+<style>
+    .dashboard-summary {
+        display: flex;
+        justify-content: space-around;
+        gap: 20px;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+    }
+    .card {
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        text-align: center;
+        flex: 1;
+        min-width: 200px;
+    }
+    .card h3 {
+        color: #007bff;
+        margin-bottom: 10px;
+    }
+    .card p {
+        font-size: 2em;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .chart-container {
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin-top: 30px;
+        height: 400px; /* Atur tinggi container grafik */
+        position: relative; /* Penting untuk maintainAspectRatio: false */
+    }
+    .chart-container h3 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 20px;
+    }
+    /* PERBAIKAN DI SINI: selector TAG 'canvas' */
+    canvas {
+        width: 100% !important; /* Pastikan canvas memenuhi container */
+        height: 100% !important; /* Pastikan canvas memenuhi container */
+    }
+</style>
+
+<%- include('partials/footer') %>

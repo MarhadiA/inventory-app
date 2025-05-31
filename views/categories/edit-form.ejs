@@ -1,0 +1,30 @@
+<%- include('../partials/header') %>
+
+<h2>Edit Kategori</h2>
+
+<% if (typeof errors !== 'undefined' && errors && errors.length > 0) { %>
+    <div class="error-message">
+        <ul>
+            <% errors.forEach(error => { %>
+                <li><%= error %></li>
+            <% }) %>
+        </ul>
+    </div>
+<% } %>
+
+<form action="/categories/edit/<%= category.id %>" method="POST">
+    <div>
+        <label for="name">Nama Kategori:</label>
+        <input type="text" id="name" name="name" value="<%= category.name %>" required>
+    </div>
+    <div>
+        <label for="description">Deskripsi:</label>
+        <textarea id="description" name="description"><%= category.description %></textarea>
+    </div>
+    <div>
+        <button type="submit" class="btn btn-edit">Simpan Perubahan</button>
+        <a href="/categories" class="btn">Batal</a>
+    </div>
+</form>
+
+<%- include('../partials/footer') %>

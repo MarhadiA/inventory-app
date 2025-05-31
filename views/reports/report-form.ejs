@@ -1,0 +1,219 @@
+<%- include('../partials/header') %>
+
+<h2>Laporan Transaksi</h2>
+
+<div class="report-filter">
+    <form action="/reports" method="GET">
+        <div>
+            <label for="startDate">Tanggal Awal:</label>
+            <input type="date" id="startDate" name="startDate" value="<%= typeof startDate !== 'undefined' ? startDate : '' %>" required>
+        </div>
+        <div>
+            <label for="endDate">Tanggal Akhir:</label>
+            <input type="date" id="endDate" name="endDate" value="<%= typeof endDate !== 'undefined' ? endDate : '' %>" required>
+        </div>
+        <div>
+            <label for="transactionType">Jenis Transaksi:</label>
+            <select id="transactionType" name="transactionType">
+                <option value="">Semua</option> <option value="Masuk" <%= typeof transactionType !== 'undefined' && transactionType === 'Masuk' ? 'selected' : '' %>>Barang Masuk</option>
+                <option value="Keluar" <%= typeof transactionType !== 'undefined' && transactionType === 'Keluar' ? 'selected' : '' %>>Barang Keluar</option>
+            </select>
+        </div>
+        <div>
+            <button type="submit" class="btn btn-filter">Tampilkan Laporan</button>
+        </div>
+    </form>
+</div>
+
+<% if (typeof transactions !== 'undefined') { %>
+    <div class="report-results">
+        <h3>Ringkasan Transaksi
+            <% if (transactionType === 'Masuk') { %>Barang Masuk<% } %>
+            <% if (transactionType === 'Keluar') { %>Barang Keluar<% } %>
+            dari <%= startDate %> s/d <%= endDate %>
+        </h3>
+
+        <% if (transactions.length > 0) { %>
+            <table>
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>Nama Barang</th>
+                        <th>Jenis Transaksi</th>
+                        <th>Jumlah</th>
+                        <th>Harga Satuan</th>
+                        <th>Total Harga</th>
+                        <th>Tanggal Transaksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% transactions.forEach((transaction, index) => { %>
+                        <% const totalHarga = transaction.quantity * (transaction.priceAtTransaction || 0); %>
+                        <tr>
+                            <td><%= index + 1 %></td>
+                            <td><%= transaction.Item ? transaction.Item.name : 'N/A' %></td>
+                            <td>
+                                <span class="badge <%= transaction.type === 'Masuk' ? 'badge-success' : 'badge-danger' %>">
+                                    <%= transaction.type %>
+                                </span>
+                            </td>
+                            <td><%= transaction.quantity %></td>
+                            <td>Rp <%= (transaction.priceAtTransaction || 0).toLocaleString('id-ID') %></td>
+                            <td>Rp <%= totalHarga.toLocaleString('id-ID') %></td>
+                            <td><%= new Date(transaction.transactionDate).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }) %></td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3" style="text-align: right; font-weight: bold;">
+                            <% if (transactionType === 'Masuk') { %>Total Kuantitas Barang Masuk:<% } %>
+                            <% if (transactionType === 'Keluar') { %>Total Kuantitas Barang Keluar:<% } %>
+                            <% if (transactionType === '') { %>Total Kuantitas Masuk:<% } %>
+                        </td>
+                        <td style="font-weight: bold;"><%= (totalQuantityMasuk || 0).toLocaleString('id-ID') %></td>
+                        <td style="text-align: right; font-weight: bold;">
+                            <% if (transactionType === 'Masuk') { %>Total Nilai Barang Masuk:<% } %>
+                            <% if (transactionType === 'Keluar') { %>Total Nilai Barang Keluar:<% } %>
+                            <% if (transactionType === '') { %>Total Nilai Masuk:<% } %>
+                        </td>
+                        <td style="font-weight: bold;">Rp <%= (totalValueMasuk || 0).toLocaleString('id-ID') %></td>
+                        <td></td>
+                    </tr>
+                    <% if (transactionType === '') { %>
+                        <tr>
+                            <td colspan="3" style="text-align: right; font-weight: bold;">Total Kuantitas Keluar:</td>
+                            <td style="font-weight: bold;"><%= (totalQuantityKeluar || 0).toLocaleString('id-ID') %></td>
+                            <td style="text-align: right; font-weight: bold;">Total Nilai Keluar:</td>
+                            <td style="font-weight: bold;">Rp <%= (totalValueKeluar || 0).toLocaleString('id-ID') %></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td colspan="5" style="text-align: right; font-weight: bold;">Selisih Nilai (Masuk - Keluar):</td>
+                            <td style="font-weight: bold;">Rp <%= ((totalValueMasuk || 0) - (totalValueKeluar || 0)).toLocaleString('id-ID') %></td>
+                            <td></td>
+                        </tr>
+                    <% } %>
+                </tfoot>
+            </table>
+        <% } else { %>
+            <p>Tidak ada transaksi yang ditemukan dalam rentang tanggal ini
+                <% if (transactionType === 'Masuk') { %> untuk jenis "Barang Masuk"<% } %>
+                <% if (transactionType === 'Keluar') { %> untuk jenis "Barang Keluar"<% } %>.
+            </p>
+        <% } %>
+    </div>
+<% } %>
+
+<style>
+    /* Umum */
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; color: #333; }
+    .container { max-width: 1200px; margin: 20px auto; padding: 20px; background-color: #fff; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    h2 { text-align: center; color: #333; margin-bottom: 20px; }
+    .btn {
+        display: inline-block; padding: 8px 15px; margin: 5px; border-radius: 5px; text-decoration: none;
+        color: white; background-color: #007bff; border: none; cursor: pointer; transition: background-color 0.2s;
+    }
+    .btn:hover { background-color: #0056b3; }
+    .btn-danger { background-color: #dc3545; }
+    .btn-danger:hover { background-color: #c82333; }
+    .btn-warning { background-color: #ffc107; color: #333; }
+    .btn-warning:hover { background-color: #e0a800; }
+    .btn-success { background-color: #28a745; }
+    .btn-success:hover { background-color: #218838; }
+
+    /* Navbar */
+    .navbar {
+        background-color: #333; padding: 15px 0; text-align: center;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .navbar a {
+        color: white; text-decoration: none; padding: 10px 20px;
+        transition: background-color 0.3s ease;
+    }
+    .navbar a:hover { background-color: #575757; }
+
+    /* Form Filter Laporan */
+    .report-filter {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        align-items: flex-end; /* Memastikan semua elemen sejajar di bagian bawah */
+    }
+    .report-filter div {
+        flex: 1;
+        min-width: 180px; /* Lebar minimum untuk input */
+    }
+    .report-filter label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #555;
+    }
+    .report-filter input[type="date"],
+    .report-filter select {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        box-sizing: border-box; /* Pastikan padding tidak menambah lebar */
+        background-color: white; /* Untuk konsistensi visual */
+        height: 38px; /* Menyamakan tinggi dengan input date */
+    }
+    .btn-filter {
+        background-color: #007bff; /* Warna biru untuk tombol filter */
+        color: white;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: background-color 0.2s ease;
+    }
+    .btn-filter:hover {
+        background-color: #0056b3;
+    }
+
+    /* Hasil Laporan (Tabel) */
+    .report-results h3 {
+        margin-top: 30px;
+        margin-bottom: 15px;
+        color: #333;
+    }
+
+    table {
+        width: 100%; border-collapse: collapse; margin-top: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1); background-color: #fff;
+    }
+    table th, table td {
+        border: 1px solid #ddd; padding: 10px; text-align: left;
+    }
+    table th {
+        background-color: #f2f2f2; font-weight: bold; color: #555;
+    }
+    table tbody tr:nth-child(even) { background-color: #f9f9f9; }
+    table tbody tr:hover { background-color: #e9e9e9; }
+
+    /* Badge untuk Jenis Transaksi */
+    .badge {
+        display: inline-block;
+        padding: 0.3em 0.6em;
+        font-size: 75%;
+        font-weight: 700;
+        line-height: 1;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: baseline;
+        border-radius: 0.25rem;
+        color: white;
+    }
+    .badge-success { background-color: #28a745; } /* Hijau untuk Masuk */
+    .badge-danger { background-color: #dc3545; }  /* Merah untuk Keluar */
+</style>
+
+<%- include('../partials/footer') %>

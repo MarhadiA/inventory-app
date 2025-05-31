@@ -1,0 +1,52 @@
+<%- include('../partials/header') %>
+
+<h2>Edit Barang</h2>
+
+<% if (typeof errors !== 'undefined' && errors && errors.length > 0) { %>
+    <div class="error-message">
+        <ul>
+            <% errors.forEach(error => { %>
+                <li><%= error %></li>
+            <% }) %>
+        </ul>
+    </div>
+<% } %>
+
+<form action="/items/edit/<%= item.id %>" method="POST">
+    <div>
+        <label for="name">Nama Barang:</label>
+        <input type="text" id="name" name="name" value="<%= item.name %>" required>
+    </div>
+    <div>
+        <label for="description">Deskripsi:</label>
+        <textarea id="description" name="description"><%= item.description %></textarea>
+    </div>
+    <div>
+        <label for="quantity">Jumlah:</label>
+        <input type="number" id="quantity" name="quantity" value="<%= item.quantity %>" required min="0">
+    </div>
+    <div>
+        <label for="price">Harga:</label>
+        <input type="number" id="price" name="price" value="<%= item.price %>" required min="1">
+    </div>
+    <div>
+        <label for="entryDate">Tanggal Masuk:</label>
+        <input type="date" id="entryDate" name="entryDate" value="<%= (new Date(item.entryDate)).toISOString().slice(0,10) %>" required>
+    </div>
+    <div>
+        <label for="CategoryId">Kategori:</label>
+        <select id="CategoryId" name="CategoryId" required>
+            <% categories.forEach(category => { %>
+                <option value="<%= category.id %>" <%= item.CategoryId == category.id ? 'selected' : '' %>>
+                    <%= category.name %>
+                </option>
+            <% }) %>
+        </select>
+    </div>
+    <div>
+        <button type="submit" class="btn btn-edit">Simpan Perubahan</button>
+        <a href="/items" class="btn">Batal</a>
+    </div>
+</form>
+
+<%- include('../partials/footer') %>

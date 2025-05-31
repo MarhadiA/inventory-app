@@ -1,0 +1,37 @@
+<%- include('../partials/header') %>
+
+<h2>Daftar Transaksi</h2>
+<a href="/transactions/add" class="btn btn-add">Tambah Transaksi Baru</a>
+
+<% if (transactions.length > 0) { %>
+<table>
+    <thead>
+        <tr>
+            <th>No.</th>
+            <th>Nama Barang</th>
+            <th>Jenis Transaksi</th>
+            <th>Jumlah</th>
+            <th>Tanggal Transaksi</th>
+            <th>Aksi</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% transactions.forEach((transaction, index) => { %>
+            <tr>
+                <td><%= index + 1 %></td>
+                <td><%= transaction.Item ? transaction.Item.name : 'N/A' %></td>
+                <td><%= transaction.type %></td>
+                <td><%= transaction.quantity %></td>
+                <td><%= new Date(transaction.transactionDate).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }) %></td>
+                <td>
+                     <a href="/transactions/detail/<%= transaction.id %>" class="btn">Detail</a>
+                </td>
+            </tr>
+        <% }) %>
+    </tbody>
+</table>
+<% } else { %>
+    <p>Belum ada transaksi yang tercatat.</p>
+<% } %>
+
+<%- include('../partials/footer') %>

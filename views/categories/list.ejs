@@ -1,0 +1,34 @@
+<%- include('../partials/header') %>
+
+<h2>Daftar Kategori</h2>
+<a href="/categories/add" class="btn btn-add">Tambah Kategori Baru</a>
+
+<% if (categories.length > 0) { %>
+<table>
+    <thead>
+        <tr>
+            <th>No.</th>
+            <th>Nama Kategori</th>
+            <th>Deskripsi</th>
+            <th>Aksi</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% categories.forEach((category, index) => { %>
+            <tr>
+                <td><%= index + 1 %></td>
+                <td><%= category.name %></td>
+                <td><%= category.description %></td>
+                <td>
+                    <a href="/categories/edit/<%= category.id %>" class="btn btn-edit">Edit</a>
+                    <a href="/categories/delete/<%= category.id %>" class="btn btn-delete" onclick="return confirm('Menghapus kategori akan mengatur CategoryId barang yang terkait menjadi NULL. Anda yakin ingin menghapus kategori ini?')">Hapus</a>
+                </td>
+            </tr>
+        <% }) %>
+    </tbody>
+</table>
+<% } else { %>
+    <p>Belum ada kategori yang terdaftar.</p>
+<% } %>
+
+<%- include('../partials/footer') %>

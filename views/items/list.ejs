@@ -1,0 +1,43 @@
+<%- include('../partials/header') %>
+
+<h2>Daftar Barang</h2>
+<a href="/items/add" class="btn btn-add">Tambah Barang Baru</a>
+
+<% if (items.length > 0) { %>
+<table>
+    <thead>
+        <tr>
+            <th>No.</th>
+            <th>Nama Barang</th>
+            <th>Deskripsi</th>
+            <th>Jumlah</th>
+            <th>Harga</th>
+            <th>Tanggal Masuk</th>
+            <th>Kategori</th>
+            <th>Aksi</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% items.forEach((item, index) => { %>
+            <tr>
+                <td><%= index + 1 %></td>
+                <td><%= item.name %></td>
+                <td><%= item.description %></td>
+                <td><%= item.quantity %></td>
+                <td>Rp <%= item.price.toLocaleString('id-ID') %></td>
+                <td><%= new Date(item.entryDate).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }) %></td>
+                <td><%= item.Category ? item.Category.name : 'N/A' %></td>
+                <td>
+                <div class="action-buttons"> <a href="/items/edit/<%= item.id %>" class="btn btn-edit">Edit</a>
+                    <a href="/items/delete/<%= item.id %>" class="btn btn-delete" onclick="return confirm('Anda yakin ingin menghapus barang ini?')">Hapus</a>
+                </div>
+            </td>
+            </tr>
+        <% }) %>
+    </tbody>
+</table>
+<% } else { %>
+    <p>Belum ada barang yang terdaftar.</p>
+<% } %>
+
+<% -include('../partials/footer') %>
